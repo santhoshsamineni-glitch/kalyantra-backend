@@ -54,3 +54,53 @@ def merge_intervals(intervals: List[Interval]) -> List[Interval]:
             merged.append(current)
 
     return merged
+def subtract_multiple(base: Interval, blocks: List[Interval]) -> List[Interval]:
+    """
+    Subtracts multiple intervals (blocks) from a base interval.
+    Returns remaining intervals after subtraction.
+    """
+
+    validate_interval(base)
+
+    if not blocks:
+        return [base]
+
+    # Validate and trim blocks to base boundaries
+    trimmed_blocks = []
+    base_start, base_end = base
+
+    for block in blocks:
+        validate_interval(block)
+        block_start, block_end = block
+
+        # Ignore completely outside blocks
+        if block_end <= base_start or block_start >= base_end:
+            continue
+
+        # Trim to base boundaries
+        trimmed_start = max(block_start, base_start)
+        trimmed_end = min(block_end, base_end)
+
+        if trimmed_start < trimmed_end:
+            trimmed_blocks.append((trimmed_start, trimmed_end))
+
+    if not trimmed_blocks:
+        return [base]
+
+    # Merge overlapping or touching blocks
+    merged_blocks = merge_intervals(trimmed_blocks)
+
+    remaining = []
+    current_start = base_start
+
+    for block_start, block_end in merged_blocks:
+        if current_start < block_start:
+            remaining.append((current_start, block_start))
+
+        current_start = block_end
+
+    # Add last segment if any remains
+    if current_start < base_end:
+        remaining.append((current_start, base_end))
+
+    return remaining
