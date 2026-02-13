@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from db.session import engine
 from db.base import Base
+from sqlalchemy.orm import Session
+from db.session import SessionLocal
+from models.organization import Organization
 
 app = FastAPI(
     title="KALYANTRA API",
@@ -27,3 +30,12 @@ def db_check():
         return {"database_status": "connected"}
     except Exception as e:
         return {"database_status": "error", "details": str(e)}
+@app.get("/organizations")
+def get_organizations():
+    db: Session = SessionLocal()
+    try:
+        organizations = db.query(Organization).all()
+        return organizations
+    finally:
+        db.close()
+    
