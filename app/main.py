@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from sqlalchemy import create_engine, text
+import os
 
 app = FastAPI(
     title="KALYANTRA API",
@@ -6,10 +8,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# 🔹 Database connection
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
+
+
 @app.get("/")
 def root():
     return {"message": "KALYANTRA API is running successfully 🚀"}
 
+
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
